@@ -10,8 +10,8 @@
        result[k] = decodeURI(v);
        return result;
      }, {});
-     const w = params.w || 300;
-     const h = params.h || 300;
+     const w = params.w || 500;
+     const h = params.h || 500;
     </script>
   </head>
   <body>
@@ -30,13 +30,14 @@
        <br>
        <form>
        <input type="text" name="w" value="${w}"> x
-       <input type="text" name="h" value="${h}"> Applet<br>
-       <input type="reset" value="RESET"><br>
+       <input type="text" name="h" value="${h}">
+       <br>
        <input type="submit" value="pchのファイルサイズを指定">
-       </form>
+	   </form>
+       <input type="file" name="file" onchange="loadFile(this)">
 
        <br>
-       <input type="file" name="file" onchange="loadFile(this)"><br>
+       <br>
      `)
 
      const loadFile = function (e) {

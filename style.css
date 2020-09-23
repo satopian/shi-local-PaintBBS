@@ -13,13 +13,7 @@ img.sample {
     margin: 0 !important;
   }
   #appstage {
-    display: flex;
-    justify-content: center;
+    display: table;
+    margin: 0 auto;
   }
-  .NEO #NEO {
-      height: 100%;
-  }
-  .NEO #viewerButtonsWrapper {
-      position: absolute;
-      bottom: 0;
-  }
+  
