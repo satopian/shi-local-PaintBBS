@@ -1,0 +1,25 @@
+img.sample {
+    border: 1px solid black;
+    margin-bottom: 5px;
+    display: block;
+  }
+  input[type="text"] {
+    width: 100px;
+  }
+  input[type="file"] {
+    z-index: 10;
+  }
+  #pageView {
+    margin: 0 !important;
+  }
+  #appstage {
+    display: flex;
+    justify-content: center;
+  }
+  .NEO #NEO {
+      height: 100%;
+  }
+  .NEO #viewerButtonsWrapper {
+      position: absolute;
+      bottom: 0;
+  }
