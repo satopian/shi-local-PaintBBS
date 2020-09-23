@@ -8,5 +8,5 @@
 結局のところお絵かきに使う事を前提に改良しただけのものです。  
 投稿ボタンを押すと画面の下に画像と動画ファイルが表示されます。  
 続きを描く事はできません。  
-funige氏のsampleをさこつさんが改良したviewer.htmlを同梱しました。  
-[sakots/pch_viewer: pch (NEO) viewer](https://github.com/sakots/pch_viewer)
+funigeさんのsampleをさこつさんが改良したviewer.htmlを同梱しています。
+[pch_viewer: pch (NEO) viewer](https://github.com/sakots/pch_viewer)
