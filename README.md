@@ -1,4 +1,4 @@
-#しぃローカル PaintBBS
+# しぃローカル PaintBBS
 サーバに設置しなくてもローカルで描けるPaintBBS NEO。
 [funige/neo: PaintBBS NEO](https://github.com/funige/neo/)のsampleを改良したものです。
 ## オリジナルのsampleとの違い
