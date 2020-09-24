@@ -20,7 +20,7 @@
     <div id="appstage">
     <script>
       var hs = Number( h );
-      hs = hs + 24;
+      hs = hs + 26;
      document.write(`
        <applet-dummy name="pch" width="${w}" height="${hs}">
          <param name="thumbnail_type" value="animation">
@@ -29,12 +29,9 @@
        <form>
        <input type="text" name="w" value="${w}"> x
        <input type="text" name="h" value="${h}">
-       <br>
-       <input type="submit" value="pchのファイルサイズを指定">
+       <input type="submit" value="pchのサイズを指定">
 	   </form>
        <input type="file" name="file" onchange="loadFile(this)">
-
-       <br>
      `)
 
      const loadFile = function (e) {
