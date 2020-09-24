@@ -4,15 +4,15 @@
     <link rel="stylesheet" href="neo.css" type="text/css">
     <script src="neo.js" charset="UTF-8"></script>
     <script>
-     const params = location.search.substring(1).split('&').reduce((result, query) => {
-       const [k, v] = query.split('=');
-       result[k] = decodeURI(v);
-       return result;
-     }, {});
-     const iw = params.iw || 350;
-     const ih = params.ih || 350;
-	const w = parseInt(iw)+150;
-	const h = parseInt(ih)+200;
+    	const params = location.search.substring(1).split('&').reduce((result, query) => {
+    		const [k, v] = query.split('=');
+    		result[k] = decodeURI(v);
+    		return result;
+    	}, {});
+    	const iw = params.iw || 350;
+    	const ih = params.ih || 350;
+    	const w = parseInt(iw) + 150;
+    	const h = parseInt(ih) + 200;
     </script>
   </head>
   <body>
@@ -46,9 +46,7 @@
     <script>
      document.write(`
 	 <form>
-       <input type="hidden" name="w" value="${w}">
-       <input type="hidden" name="h" value="${h}">
-	   <select class=canvas_select name=iw title=幅><option value=350>350<option value=400>400<option value=450>450<option value=500>500<option value=550>550<option value=600>600<option value=650>650<option value=700>700<option value=750>750<option value=800>800</select> x <select class=canvas_select name="ih" title=高さ><option value=350>350<option value=400>400<option value=450>450<option value=500>500<option value=550>550<option value=600>600<option value=650>650<option value=700>700<option value=750>750<option value=800>800</select>
+       	   <select class=canvas_select name=iw title=幅><option value=350>350<option value=400>400<option value=450>450<option value=500>500<option value=550>550<option value=600>600<option value=650>650<option value=700>700<option value=750>750<option value=800>800</select> x <select class=canvas_select name="ih" title=高さ><option value=350>350<option value=400>400<option value=450>450<option value=500>500<option value=550>550<option value=600>600<option value=650>650<option value=700>700<option value=750>750<option value=800>800</select>
 
         <input type="submit" value="Choose">
        </form>
@@ -189,6 +187,10 @@
     		width: 160px;
     		padding: 0 0 0 10px;
     	}
+		h1 {
+		margin: 8px 0;
+    	font-size: 30px;
+		}
     </style>
     <!-- https://github.com/funige/neo/ のサンプルを改造したものです。動的パレットはWonderCatStudioが開発したスクリプトです。改造者 https://github.com/satopian/shi-local-PaintBBS さとぴあ -->
 

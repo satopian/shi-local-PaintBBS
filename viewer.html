@@ -3,7 +3,6 @@
   <head>
     <link rel="stylesheet" href="neo.css" type="text/css">
     <script src="neo.js" charset="UTF-8"></script>
-    <link rel="stylesheet" href="style.css" type="text/css">
     <script>
      const params = location.search.substring(1).split('&').reduce((result, query) => {
        const [k, v] = query.split('=');
@@ -55,5 +54,34 @@
      }
     </script>
 	</div>
+	<style>
+		img.sample {
+			border: 1px solid black;
+			margin-bottom: 5px;
+			display: block;
+		}
+
+		input[type="text"] {
+			width: 100px;
+		}
+
+		input[type="file"] {
+			z-index: 10;
+		}
+
+		#pageView {
+			margin: 0 !important;
+		}
+
+		#appstage {
+			display: table;
+			margin: 0 auto;
+		}
+
+		h1 {
+			margin: 8px 0;
+			font-size: 30px;
+		}
+	</style>
   </body>
 </html>
