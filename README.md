@@ -11,7 +11,7 @@
 
 投稿ボタンを押すと画面の下に画像と動画ファイルが表示されます。  
 続きを描く事はできません。  
-funigeさんのsampleをさこつさんが改良したviewer.htmlも同梱しました。
+funigeさんのsampleをさこつさんが改造したviewer.htmlも同梱しました。
 
 [pch_viewer: pch (NEO) viewer](https://github.com/sakots/pch_viewer)
 
