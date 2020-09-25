@@ -1,6 +1,6 @@
 # しぃローカル PaintBBS
 サーバに設置しなくてもローカルで描けるPaintBBS NEO。  
-お絵かき掲示板のお絵かき機能だけ使いたいユーザーのためのアプリです。 
+お絵かき掲示板のお絵かき機能だけ使いたいユーザーのためのアプリです。  
 [funige/neo: PaintBBS NEO](https://github.com/funige/neo/)のsampleをカスタマイズしました。
 ## オリジナルのsampleとの違い
 - WonderCatStudioの動的パレットスクリプトが使えます。
