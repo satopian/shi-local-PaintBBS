@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
+
+<head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
-    <link rel="stylesheet" href="neo.css" type="text/css">
-    <script src="neo.js" charset="UTF-8"></script>
-    <script>
-    	const params = location.search.substring(1).split('&').reduce((result, query) => {
-    		const [k, v] = query.split('=');
-    		result[k] = decodeURI(v);
-    		return result;
-    	}, {});
-    	const w = params.w || 350;
-    	const h = params.h || 350;
-    	const appw = parseInt(w) + 150;
-    	const apph = parseInt(h) + 200;
-    </script>
+	<link rel="stylesheet" href="neo.css" type="text/css">
+	<script src="neo.js" charset="UTF-8"></script>
+	<script>
+		const params = location.search.substring(1).split('&').reduce((result, query) => {
+			const [k, v] = query.split('=');
+			result[k] = decodeURI(v);
+			return result;
+		}, {});
+		const w = params.w || 350;
+		const h = params.h || 350;
+		const appw = parseInt(w) + 150;
+		const apph = parseInt(h) + 200;
+	</script>
   </head>
   <body>
     <a href="viewer.html">PCH Test</a>
@@ -45,160 +46,180 @@
 		<NOSCRIPT><H3>JavaScriptが有効でないため正常に動作致しません</H3></NOSCRIPT>
 		<div class="appstage">
 			<div class="app">
-    <script>
-     document.write(`
-	 <form>
-       	   <select class=canvas_select name="w" title=幅><option value=350>350<option value=400>400<option value=450>450<option value=500>500<option value=550>550<option value=600>600<option value=650>650<option value=700>700<option value=750>750<option value=800>800</select> x <select class=canvas_select name="h" title=高さ><option value=350>350<option value=400>400<option value=450>450<option value=500>500<option value=550>550<option value=600>600<option value=650>650<option value=700>700<option value=750>750<option value=800>800</select>
+			<form>
+					<select class=canvas_select name="w" title=幅><option value=350>350<option value=400>400<option value=450>450<option value=500>500<option value=550>550<option value=600>600<option value=650>650<option value=700>700<option value=750>750<option value=800>800</select> x <select class=canvas_select name="h" title=高さ><option value=350>350<option value=400>400<option value=450>450<option value=500>500<option value=550>550<option value=600>600<option value=650>650<option value=700>700<option value=750>750<option value=800>800</select>
+		
+			<input type="submit" value="Choose">
+			</form>
+			Toolbar <input type="radio" name="1" id="1" onclick="Neo.setToolSide(true)" class="nts_radio"><label class="ntslabel"
+				for="1">Left</label>
+			<input type="radio" name="1" id="2" onclick="Neo.setToolSide(false)" checked="checked" class="nts_radio"><label
+				class="ntslabel" for="2">Right</label>
+			<br>
+			<div id="appletdummy">
+			</div>
 
-        <input type="submit" value="Choose">
-       </form>
-	   Toolbar <input type="radio" name="1" id="1" onclick="Neo.setToolSide(true)" class="nts_radio"><label class="ntslabel" for="1">Left</label>
-	   <input type="radio" name="1" id="2" onclick="Neo.setToolSide(false)" checked="checked" class="nts_radio"><label class="ntslabel" for="2">Right</label>
+			<script>
+				const appletdummy = document.getElementById("appletdummy");
+				appletdummy.innerHTML = `<applet-dummy name="paintbbs" width="${appw}" height="${apph}" >` +
+					`<param name="image_width" value="${w}">` +
+					`<param name="image_height" value="${h}">` +
+					'<param name="thumbnail_type" value="animation">' +
+					'</applet-dummy>';
 
-       
-       <br>
-       <applet-dummy name="paintbbs" width="${appw}" height="${apph}" >
-         <param name="image_width" value="${w}">
-         <param name="image_height" value="${h}">
-         <param name="thumbnail_type" value="animation">
-       </applet-dummy>
+				document.paintBBSCallback = function (str) {
+					if (str === 'check') {
+						const image = Neo.painter.getImage();
+						const animation = Neo.painter.getThumbnail('animation');
 
-     `)
+						const img = document.createElement('img');
+						img.src = image.toDataURL('image/png');
+						img.className = "sample";
 
-     document.paintBBSCallback = function (str) {
-       if (str === 'check') {
-         const image = Neo.painter.getImage();
-         const animation = Neo.painter.getThumbnail('animation');
-         
-         const img = document.createElement('img');
-         img.src = image.toDataURL('image/png');
-         img.className = "sample";
+						const a = document.createElement('a');
+						a.href = URL.createObjectURL(animation);
+						a.innerHTML = a.download = (new Date() - 0) + ".pch";
 
-         const a = document.createElement('a');
-         a.href= URL.createObjectURL(animation);
-         a.innerHTML = a.download = (new Date() - 0) + ".pch";
+						const top = document.querySelector('img.sample')
+						document.body.insertBefore(img, top);
+						document.body.insertBefore(a, top);
+						return false;
+					}
+				}
+			</script>
+			</div>
+			<div class="palette_wrap">
+				<div class="palette">
+					<FORM name="Palette">
+						<span class="palette_desc">PALETTE</span> <INPUT type="button" VALUE="一時保存" OnClick="PaletteSave()"><br>
+						<select name="select" size="13" onChange="setPalette()" class="palette_select">
+							<option>一時保存パレット</option>
+							<option>肌色系</option>
+							<option>赤系</option>
+							<option>黄・橙系</option>
+							<option>緑系</option>
+							<option>青系</option>
+							<option>紫系</option>
+							<option>セピア</option>
+							<option>人物</option>
+							<option>パステル</option>
+							<option>草原の大地</option>
+							<option>萌えサクラ</option>
+							<option>モノクロ</option>
+						</select><br>
+						<INPUT type="button" VALUE="作成" OnClick="PaletteNew()">
+						<INPUT type="button" VALUE="変更" OnClick="PaletteRenew()">
+						<INPUT type="button" VALUE="削除" OnClick="PaletteDel()"><br>
+						<INPUT type="button" VALUE="明＋" OnClick="P_Effect(10)">
+						<INPUT type="button" VALUE="明－" OnClick="P_Effect(-10)">
+						<INPUT type="button" VALUE="反転" OnClick="P_Effect(255)">
+						<hr class="palette_hr"><span class="palette_desc">MATRIX</span>
+						<SELECT name="m_m">
+							<option value="0">全体</option>
+							<option value="1">現在</option>
+							<option value="2">追加</option>
+						</SELECT><br>
+						<INPUT name="m_g" type="button" VALUE="取得" OnClick="PaletteMatrixGet()">
+						<INPUT name="m_s" type="button" VALUE="セット" OnClick="PalleteMatrixSet()">
+						<INPUT name="m_h" type="button" VALUE=" ? " OnClick="PalleteMatrixHelp()"><br>
+						<TEXTAREA rows="1" name="setr" cols="13" onMouseOver="this.select()"></TEXTAREA><br>
+					</FORM>
+				</div>
+				<div class="palette_gradation">
+					<FORM name="grad">
+						<label class="palette_desc checkbox"><INPUT type="checkbox" name="view" OnClick="showHideLayer()"
+								id="grdchk">GRADATION&nbsp;</label><INPUT type="button" VALUE=" OK " OnClick="ChengeGrad()"><br>
+						<SELECT name="p_st" onChange="GetPalette()">
+							<option>1</option>
+							<option>2</option>
+							<option>3</option>
+							<option>4</option>
+							<option>5</option>
+							<option>6</option>
+							<option>7</option>
+							<option>8</option>
+							<option>9</option>
+							<option>10</option>
+							<option>11</option>
+							<option>12</option>
+							<option>13</option>
+							<option>14</option>
+						</SELECT><input type="text" name="pst" size="8" onKeyPress="Chenge_()" onChange="Chenge_()"><br>
+						<SELECT name="p_ed" onChange="GetPalette()">
+							<option>1</option>
+							<option>2</option>
+							<option>3</option>
+							<option>4</option>
+							<option>5</option>
+							<option>6</option>
+							<option>7</option>
+							<option>8</option>
+							<option>9</option>
+							<option>10</option>
+							<option>11</option>
+							<option selected>12</option>
+							<option>13</option>
+							<option>14</option>
+						</SELECT><input type="text" name="ped" size="8" onKeyPress="Chenge_()" onChange="Chenge_()">
+					</FORM>
+				</div>
+				<Script>
+					if (DynamicColor) PaletteListSetColor();
+				</Script>
+			</div>
+			</div>
+			<style>
+				select.canvas_select {
+					height: 25px;
+				}
 
-         const top = document.querySelector('img.sample')
-         document.body.insertBefore(img, top);
-         document.body.insertBefore(a, top);
-         return false;
-       }
-     }
-    </script>
-    </div>
-    <div class="palette_wrap">
-		<div class="palette"><FORM name="Palette">
-		<span class="palette_desc">PALETTE</span> <INPUT type="button" VALUE="一時保存" OnClick="PaletteSave()"><br>
-		<select name="select" size="13" onChange="setPalette()" class="palette_select">
-		<option>一時保存パレット</option>
-		<option>肌色系</option><option>赤系</option><option>黄・橙系</option><option>緑系</option><option>青系</option><option>紫系</option><option>セピア</option><option>人物</option><option>パステル</option><option>草原の大地</option><option>萌えサクラ</option><option>モノクロ</option></select><br>
-		<INPUT type="button" VALUE="作成" OnClick="PaletteNew()">
-		<INPUT type="button" VALUE="変更" OnClick="PaletteRenew()">
-		<INPUT type="button" VALUE="削除" OnClick="PaletteDel()"><br>
-		<INPUT type="button" VALUE="明＋" OnClick="P_Effect(10)">
-		<INPUT type="button" VALUE="明－" OnClick="P_Effect(-10)">
-		<INPUT type="button" VALUE="反転" OnClick="P_Effect(255)">
-		<hr class="palette_hr"><span class="palette_desc">MATRIX</span>
-		<SELECT name="m_m">
-		<option value="0">全体</option>
-		<option value="1">現在</option>
-		<option value="2">追加</option>
-		</SELECT><br>
-		<INPUT name="m_g" type="button" VALUE="取得" OnClick="PaletteMatrixGet()">
-		<INPUT name="m_s" type="button" VALUE="セット" OnClick="PalleteMatrixSet()">
-		<INPUT name="m_h" type="button" VALUE=" ? " OnClick="PalleteMatrixHelp()"><br>
-		<TEXTAREA rows="1" name="setr" cols="13" onMouseOver="this.select()"></TEXTAREA><br>
-		</FORM></div>
-		<div class="palette_gradation"><FORM name="grad">
-		<label class="palette_desc checkbox" ><INPUT type="checkbox" name="view" OnClick="showHideLayer()" id="grdchk">GRADATION&nbsp;</label><INPUT type="button" VALUE=" OK " OnClick="ChengeGrad()"><br>
-		<SELECT name="p_st" onChange="GetPalette()">
-		<option>1</option>
-		<option>2</option>
-		<option>3</option>
-		<option>4</option>
-		<option>5</option>
-		<option>6</option>
-		<option>7</option>
-		<option>8</option>
-		<option>9</option>
-		<option>10</option>
-		<option>11</option>
-		<option>12</option>
-		<option>13</option>
-		<option>14</option>
-		</SELECT><input type="text" name="pst" size="8" onKeyPress="Chenge_()" onChange="Chenge_()"><br>
-		<SELECT name="p_ed" onChange="GetPalette()">
-		<option>1</option>
-		<option>2</option>
-		<option>3</option>
-		<option>4</option>
-		<option>5</option>
-		<option>6</option>
-		<option>7</option>
-		<option>8</option>
-		<option>9</option>
-		<option>10</option>
-		<option>11</option>
-		<option selected>12</option>
-		<option>13</option>
-		<option>14</option>
-		</SELECT><input type="text" name="ped" size="8" onKeyPress="Chenge_()" onChange="Chenge_()">
-		</FORM></div>
-		<Script>
-		if(DynamicColor) PaletteListSetColor();
-		</Script>
-		</div>
-		</div>
-    <style>
-    	select.canvas_select {
-    		height: 25px;
-    	}
+				input[type="submit"] {
+					height: 25px;
+				}
 
-    	input[type="submit"] {
-    		height: 25px;
-    	}
+				form {
+					display: inline-block;
+					margin: 0 0 12px;
+				}
 
-    	form {
-    		display: inline-block;
-    		margin: 0 0 12px;
-    	}
+				img.sample {
+					border: 1px solid black;
+					margin-bottom: 5px;
+					display: block;
+					margin: 10px auto;
+				}
 
-    	img.sample {
-    		border: 1px solid black;
-    		margin-bottom: 5px;
-    		display: block;
-    		margin: 10px auto;
-    	}
+				#pageView {
+					margin: 0 !important;
+				}
 
-    	#pageView {
-    		margin: 0 !important;
-    	}
+				.appstage {
+					margin: 0 auto;
+					display: table;
+				}
 
-    	.appstage {
-    		margin: 0 auto;
-    		display: table;
-    	}
+				label {
+					cursor: pointer;
+				}
 
-    	label {
-    		cursor: pointer;
-    	}
+				.palette_wrap {
+					display: table-cell;
+					vertical-align: middle;
+					width: 160px;
+					padding: 0 0 0 10px;
+				}
 
-    	.palette_wrap {
-    		display: table-cell;
-    		vertical-align: middle;
-    		width: 160px;
-    		padding: 0 0 0 10px;
-		}
-		.palette_select{
-			min-width: 130px;
-		}
-		h1 {
-		margin: 8px 0;
-    	font-size: 30px;
-		}
-    </style>
-    <!-- https://github.com/funige/neo/ のサンプルを改造したものです。動的パレットはWonderCatStudioが開発したスクリプトです。改造者 https://github.com/satopian/shi-local-PaintBBS さとぴあ -->
+				.palette_select {
+					min-width: 130px;
+				}
 
-    </body>
+				h1 {
+					margin: 8px 0;
+					font-size: 30px;
+				}
+			</style>
+			<!-- https://github.com/funige/neo/ のサンプルを改造したものです。動的パレットはWonderCatStudioが開発したスクリプトです。改造者 https://github.com/satopian/shi-local-PaintBBS さとぴあ -->
 
-    </html>
+			</body>
+
+			</html>
