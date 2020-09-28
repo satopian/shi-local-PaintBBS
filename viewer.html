@@ -1,58 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
+<head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="stylesheet" href="neo.css" type="text/css">
-    <script src="neo.js" charset="UTF-8"></script>
-    <script>
-     const params = location.search.substring(1).split('&').reduce((result, query) => {
-       const [k, v] = query.split('=');
-       result[k] = decodeURI(v);
-       return result;
-     }, {});
-     const w = params.w || 500;
-     const h = params.h || 500;
-    </script>
-  </head>
-  <body>
-    <a href="index.html">PaintBBS Test</a>
-    <h1>PCH Test</h1>
-
-    <div id="appstage">
-    <script>
-      var hs = Number( h );
-      hs = hs + 26;
-     document.write(`
-       <applet-dummy name="pch" width="${w}" height="${hs}">
-         <param name="thumbnail_type" value="animation">
-       </applet-dummy>
-
-       <form>
-       <input type="text" name="w" value="${w}"> x
-       <input type="text" name="h" value="${h}">
-       <input type="submit" value="pchのサイズを指定">
-	   </form>
-       <input type="file" name="file" onchange="loadFile(this)">
-     `)
-
-     const loadFile = function (e) {
-       const data = e.files[0]
-       const reader = new FileReader();
-       reader.onload = function () {
-         const pch = Neo.decodePCH(reader.result);
-         console.log(pch)
-
-         Neo.createViewer(document.querySelector('input'));
-         Neo.config.width = pch.width;
-         Neo.config.height = pch.height;
-         Neo.initViewer(pch);
-         Neo.startViewer();
-       }
-       reader.readAsArrayBuffer(data);
-     }
-    </script>
-	</div>
+	<link rel="stylesheet" href="neo.css" type="text/css">
+	<script src="neo.js"></script>
+	<script>
+		const params = location.search.substring(1).split('&').reduce((result, query) => {
+			const [k, v] = query.split('=');
+			result[k] = decodeURI(v);
+			return result;
+		}, {});
+		const w = params.w || 500;
+		const h = params.h || 500;
+	</script>
 	<style>
 		img.sample {
 			border: 1px solid black;
@@ -82,5 +43,46 @@
 			font-size: 30px;
 		}
 	</style>
-  </body>
+
+</head>
+
+<body>
+	<a href="index.html">PaintBBS Test</a>
+	<h1>PCH Test</h1>
+
+	<div id="appstage">
+		<div id="appletdummy">
+		</div>
+
+		<script>
+			var hs = Number(h);
+			hs = hs + 26;
+			const appletdummy = document.getElementById("appletdummy");
+			appletdummy.innerHTML = '<applet-dummy name="pch" width="' + w + '" height="' + hs + '" >' +
+				'<param name="thumbnail_type" value="animation">' +
+				'</applet-dummy>' +
+				'<form>' +
+				'<input type="text" name="w" value="' + w + '"> x' +
+				'<input type="text" name="h" value="' + h + '">' +
+				'<input type="submit" value="pchのサイズを指定">' +
+				'</form>' +
+				'<input type="file" name="file" onchange="loadFile(this)">'
+			const loadFile = function (e) {
+				const data = e.files[0]
+				const reader = new FileReader();
+				reader.onload = function () {
+					const pch = Neo.decodePCH(reader.result);
+					console.log(pch)
+
+					Neo.createViewer(document.querySelector('input'));
+					Neo.config.width = pch.width;
+					Neo.config.height = pch.height;
+					Neo.initViewer(pch);
+					Neo.startViewer();
+				}
+				reader.readAsArrayBuffer(data);
+			}
+		</script>
+	</div>
+</body>
 </html>
