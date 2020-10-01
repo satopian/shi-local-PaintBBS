@@ -12,11 +12,12 @@
 			result[k] = decodeURI(v);
 			return result;
 		}, {});
-		const w = params.w || 350;
-		const h = params.h || 350;
+		const w = params.w || 300;
+		const h = params.h || 300;
 		const appw = parseInt(w) + 150;
-		const apph = parseInt(h) + 200;
-	</script>
+		let apph = parseInt(h) + 200;
+		if(apph < 560){apph = 560;}//最低高
+	</script>	
 	<style>
 		select.canvas_select {
 			height: 25px;
@@ -100,6 +101,7 @@
 		<div class="app">
 			<form>
 				<select class=canvas_select name="w" title=幅>
+					<option value=300>300
 					<option value=350>350
 					<option value=400>400
 					<option value=450>450
@@ -111,7 +113,7 @@
 					<option value=750>750
 					<option value=800>800
 				</select> x <select class=canvas_select name="h" title=高さ>
-					<option value=350>350
+					<option value=300>300
 					<option value=400>400
 					<option value=450>450
 					<option value=500>500
