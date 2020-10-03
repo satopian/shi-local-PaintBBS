@@ -19,5 +19,5 @@ funigeさんのsampleをさこつさんが改造したviewer.htmlも同梱しま
 
 web版もあります。  
 [shi local PaintBBS Web Edition | お絵かき掲示板ツールが使えます](https://pbbs.sakura.ne.jp/localPaintBBS/)  
-iPadはダウンロードしたHTMLファイルをブラウザで開く事ができないためweb版を用意しました。  
+iPadではダウンロードしたHTMLファイルをブラウザで開く事ができないためweb版を用意しました。  
 一度このページを開けば回線を接続していなくても描けます。  
