@@ -16,3 +16,8 @@ funigeさんのsampleをさこつさんが改造したviewer.htmlも同梱しま
 [pch_viewer: pch (NEO) viewer](https://github.com/sakots/pch_viewer)
 
 ![タイトルなし](https://user-images.githubusercontent.com/44894014/94016635-509e9980-fde9-11ea-94ea-f6658bb32f0b.png)
+
+web版もあります。
+[shi local PaintBBS Web Edition | お絵かき掲示板ツールが使えます](https://pbbs.sakura.ne.jp/localPaintBBS/)
+iPadはダウンロードしたHTMLファイルをブラウザで開く事ができないためweb版を用意しました。
+一度このページを開けば回線を接続していなくても描けます。
