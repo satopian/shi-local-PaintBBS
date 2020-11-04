@@ -2,6 +2,7 @@
 <html lang="ja">
 
 <head>
+	<title>shi local PaintBBS</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
 	<link rel="stylesheet" href="neo.css" type="text/css">
@@ -44,7 +45,7 @@
 		}
 
 		.appstage {
-			margin: 0 auto;
+			margin: 16px auto;
 			display: table;
 		}
 
@@ -71,7 +72,6 @@
 </head>
 <body>
 <a href="viewer.html">PCH Test</a>
-<h1>PaintBBS Test</h1>
 <script>
 	var DynamicColor = 1;	// パレットリストに色表示
 	var Palettes = new Array();
@@ -162,6 +162,17 @@
 						return false;
 					}
 				}
+			checkd_if_formval_equal_val(document.forms[0].w,w);
+			checkd_if_formval_equal_val(document.forms[0].h,h);
+			function checkd_if_formval_equal_val(docformsname,val) {
+				var j;
+					for(j = 0; docformsname.length > j; j ++) {
+					if(docformsname[j].value == val){
+						docformsname.selectedIndex = j;//プルダウンメニュー
+					}
+				}
+			}
+
 			</script>
 		</div>
 		<div class="palette_wrap">
