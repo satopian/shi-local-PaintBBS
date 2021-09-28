@@ -138,12 +138,19 @@
 			</div>
 
 			<script>
-				const appletdummy = document.getElementById("appletdummy");
-				appletdummy.innerHTML = '<applet-dummy name="paintbbs" width="' + appw + '" height="' + apph + '" >' +
-					'<param name="image_width" value="' + w + '">' +
-					'<param name="image_height" value="' + h + '"' +
-					'<param name="thumbnail_type" value="animation">' +
-					'</applet-dummy>';
+				// const appletdummy = document.getElementById("appletdummy");
+				// appletdummy.innerHTML = '<applet-dummy name="paintbbs" width="' + appw + '" height="' + apph + '" >' +
+				// 	'<param name="image_width" value="' + w + '">' +
+				// 	'<param name="image_height" value="' + h + '"' +
+				// 	'<param name="thumbnail_type" value="animation">' +
+				// 	'</applet-dummy>';
+				document.write(`
+				  <applet-dummy name="paintbbs" width="${appw}" height="${apph}" >
+					<param name="image_width" value="${w}">
+					<param name="image_height" value="${h}">
+					<param name="thumbnail_type" value="animation">
+				  </applet-dummy>
+				`)
 
 				document.paintBBSCallback = function (str) {
 					if (str === 'check') {
