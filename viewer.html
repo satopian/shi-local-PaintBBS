@@ -58,31 +58,41 @@
 		<script>
 			var hs = Number(h);
 			hs = hs + 26;
-			const appletdummy = document.getElementById("appletdummy");
-			appletdummy.innerHTML = '<applet-dummy name="pch" width="' + w + '" height="' + hs + '" >' +
-				'<param name="thumbnail_type" value="animation">' +
-				'</applet-dummy>' +
-				'<form>' +
-				'<input type="text" name="w" value="' + w + '"> x' +
-				'<input type="text" name="h" value="' + h + '">' +
-				'<input type="submit" value="pchのサイズを指定">' +
-				'</form>' +
-				'<input type="file" name="file" onchange="loadFile(this)">'
-			const loadFile = function (e) {
-				const data = e.files[0]
-				const reader = new FileReader();
-				reader.onload = function () {
-					const pch = Neo.decodePCH(reader.result);
-					console.log(pch)
 
-					Neo.createViewer(document.querySelector('input'));
-					Neo.config.width = pch.width;
-					Neo.config.height = pch.height;
-					Neo.initViewer(pch);
-					Neo.startViewer();
-				}
-				reader.readAsArrayBuffer(data);
+
+		const html = `<applet-dummy name="pch" width="${w}" height="${hs}">
+		<param name="thumbnail_type" value="animation">
+		</applet-dummy>
+		<br>
+		<form>
+		<input type="text" name="w" value="${w}"> x
+		<input type="text" name="h" value="${h}"> Applet<br>
+		<input type="reset" value="RESET"><br>
+		<input type="submit" value="pchのファイルサイズを指定">
+		</form>
+		<br>
+		<input type="file" name="file" onchange="loadFile(this)"><br>
+		`;
+
+		const appletdummy = document.getElementById("appletdummy");
+		appletdummy.insertAdjacentHTML('afterbegin', html);
+
+
+		const loadFile = function (e) {
+			const data = e.files[0]
+			const reader = new FileReader();
+			reader.onload = function () {
+				const pch = Neo.decodePCH(reader.result);
+				console.log(pch)
+
+				Neo.createViewer(document.querySelector('input'));
+				Neo.config.width = pch.width;
+				Neo.config.height = pch.height;
+				Neo.initViewer(pch);
+				Neo.startViewer();
 			}
+			reader.readAsArrayBuffer(data);
+		}
 		</script>
 	</div>
 </body>

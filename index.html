@@ -134,23 +134,18 @@
 			<input type="radio" name="1" id="2" onclick="Neo.setToolSide(false)" checked="checked" class="nts_radio"><label
 				class="ntslabel" for="2">Right</label>
 			<br>
-			<div id="appletdummy">
-			</div>
+			<div id="appletdummy"></div>
 
 			<script>
-				// const appletdummy = document.getElementById("appletdummy");
-				// appletdummy.innerHTML = '<applet-dummy name="paintbbs" width="' + appw + '" height="' + apph + '" >' +
-				// 	'<param name="image_width" value="' + w + '">' +
-				// 	'<param name="image_height" value="' + h + '"' +
-				// 	'<param name="thumbnail_type" value="animation">' +
-				// 	'</applet-dummy>';
-				document.write(`
-				  <applet-dummy name="paintbbs" width="${appw}" height="${apph}" >
+
+		const html = `<applet-dummy name="paintbbs" width="${appw}" height="${apph}" >
 					<param name="image_width" value="${w}">
 					<param name="image_height" value="${h}">
 					<param name="thumbnail_type" value="animation">
-				  </applet-dummy>
-				`)
+					</applet-dummy>`;
+
+      	const appletdummy = document.getElementById("appletdummy");
+      	appletdummy.insertAdjacentHTML('afterbegin', html);
 
 				document.paintBBSCallback = function (str) {
 					if (str === 'check') {
