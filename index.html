@@ -8,6 +8,19 @@
 	<link rel="stylesheet" href="neo.css" type="text/css">
 	<script src="neo.js"></script>
 	<script>
+		function fixneo() {
+	
+			if(screen.width>767){//iPad以上の横幅の時は、NEOの網目のところでtouchmoveしない。
+				console.log(screen.width);
+				document.querySelector('#NEO').addEventListener('touchmove', function (e){
+					e.preventDefault();
+					e.stopPropagation();
+				}, { passive: false });
+			}
+		}
+		window.addEventListener('DOMContentLoaded',fixneo,false);
+	</script>
+	<script>
 		const params = location.search.substring(1).split('&').reduce((result, query) => {
 			const [k, v] = query.split('=');
 			result[k] = decodeURI(v);
@@ -127,7 +140,7 @@
 					<option value=800>800
 				</select>
 
-				<input type="submit" value="Choose">
+				<input type="submit" value="Choice">
 			</form>
 			Toolbar <input type="radio" name="1" id="1" onclick="Neo.setToolSide(true)" class="nts_radio"><label
 				class="ntslabel" for="1">Left</label>
