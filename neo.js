@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var Neo = function () {};
 
-Neo.version = "1.5.10";
+Neo.version = "1.5.16";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -553,7 +553,10 @@ Neo.backgroundImage = function () {
   var bgCanvas = document.createElement("canvas");
   bgCanvas.width = 16;
   bgCanvas.height = 16;
-  var ctx = bgCanvas.getContext("2d");
+  var ctx = bgCanvas.getContext("2d", {
+	willReadFrequently: true,
+  });
+
   var imageData = ctx.getImageData(0, 0, 16, 16);
   var buf32 = new Uint32Array(imageData.data.buffer);
   var buf8 = new Uint8ClampedArray(imageData.data.buffer);
@@ -810,7 +813,7 @@ Neo.initButtons = function () {
   Neo.fillButton = new Neo.FillButton().init("fill");
   Neo.rightButton = new Neo.RightButton().init("right");
 
-  if (Neo.isMobile()) {
+  if (Neo.isMobile() || Neo.config.neo_show_right_button == "true") {
     Neo.rightButton.element.style.display = "block";
   }
 
@@ -1044,7 +1047,9 @@ Neo.resizeCanvas = function () {
 
   Neo.painter.destCanvas.width = width;
   Neo.painter.destCanvas.height = height;
-  Neo.painter.destCanvasCtx = Neo.painter.destCanvas.getContext("2d");
+  Neo.painter.destCanvasCtx = Neo.painter.destCanvas.getContext("2d", {
+	willReadFrequently: true,
+  });
   Neo.painter.destCanvasCtx.imageSmoothingEnabled = false;
   //Neo.painter.destCanvasCtx.mozImageSmoothingEnabled = false;
 
@@ -1074,162 +1079,197 @@ Neo.resizeCanvas = function () {
    -----------------------------------------------------------------------
  */
 
-Neo.clone = function (src) {
-  var dst = {};
-  for (var k in src) {
-    dst[k] = src[k];
-  }
-  return dst;
-};
-
-Neo.getSizeString = function (len) {
-  var result = String(len);
-  while (result.length < 8) {
-    result = "0" + result;
-  }
-  return result;
-};
-
-Neo.openURL = function (url) {
-  if (Neo.isApp) {
-    require("electron").shell.openExternal(url);
-  } else {
-    window.open(url, "_blank");
-  }
-};
-
-Neo.submit = function (board, blob, thumbnail, thumbnail2) {
-  var url = board + Neo.config.url_save;
-  var headerString = Neo.str_header || "";
-
-  // console.log("submit url=" + url + " header=" + headerString);
-
-  if (document.paintBBSCallback) {
-    var result = document.paintBBSCallback("check");
-    if (result == 0 || result == "false") {
-      return;
-    }
-
-    result = document.paintBBSCallback("header");
-    if (result && typeof result == "string") {
-      headerString == result;
-    }
-  }
-  if (!headerString) headerString = Neo.config.send_header || "";
-
-  var imageType = Neo.config.send_header_image_type;
-  if (imageType && imageType == "true") {
-    headerString = "image_type=png&" + headerString;
-  }
-
-  var count = Neo.painter.securityCount;
-  var timer = new Date() - Neo.painter.securityTimer;
-  if (Neo.config.send_header_count == "true") {
-    headerString = "count=" + count + "&" + headerString;
-  }
-  if (Neo.config.send_header_timer == "true") {
-    headerString = "timer=" + timer + "&" + headerString;
-  }
-  console.log("header: " + headerString);
-
-  if (Neo.config.neo_emulate_security_error == "true") {
-    var securityError = false;
-    if (Neo.config.security_click) {
-      if (count - parseInt(Neo.config.security_click || 0) < 0) {
-        securityError = true;
-      }
-    }
-    if (Neo.config.security_timer) {
-      if (timer - parseInt(Neo.config.security_timer || 0) * 1000 < 0) {
-        securityError = true;
-      }
-    }
-    if (securityError && Neo.config.security_url) {
-      if (Neo.config.security_post == "true") {
-        url = Neo.config.security_url;
-      } else {
-        location.href = Neo.config.security_url;
-        return;
-      }
-    }
-  }
-
-  var header = new Blob([headerString]);
-  var headerLength = this.getSizeString(header.size);
-  var imgLength = this.getSizeString(blob.size);
-
-  var array = [
-    "P", // PaintBBS
-    headerLength,
-    header,
-    imgLength,
-    "\r\n",
-    blob,
-  ];
-
-  if (thumbnail) {
-    var thumbnailLength = this.getSizeString(thumbnail.size);
-    array.push(thumbnailLength, thumbnail);
-  }
-  if (thumbnail2) {
-    var thumbnail2Length = this.getSizeString(thumbnail2.size);
-    array.push(thumbnail2Length, thumbnail2);
-  }
-
-  var body = new Blob(array, { type: "application/octet-binary" }); //これが必要！！
-
-  var request = new XMLHttpRequest();
-  request.open("POST", url, true);
-
-  request.onload = function (e) {
-    console.log(request.response, "status=", request.status);
-    //Neo.submitButton.enable();
-    if (request.status / 100 == 2) {
-      Neo.uploaded = true;
-    }
-
-    var url = Neo.config.url_exit;
-    if (url[0] == "/") {
-      url = url.replace(/^.*\//, ""); //よくわかんないけどとりあえず
-    }
-
-    // ふたばのpaintpost.phpは、画像投稿に成功するとresponseに
-    // "./futaba.php?mode=paintcom&amp;painttmp=.png"
-    // という文字列を返します。
-    //
-    // NEOでは、responseに文字列"painttmp="が含まれる場合は
-    // <PARAM>で指定されたurl_exitを無視して、このURLにジャンプします。
-    var responseURL = request.response.replace(/&amp;/g, "&");
-    if (responseURL.match(/painttmp=/)) {
-      url = responseURL;
-    }
-    var exitURL = board + url;
-
-    // しぃちゃんのドキュメントをよく見たら
-    // responseが "URL:〜" の形だった場合はそこへ飛ばすって書いてありました。
-    // こっちを使うべきでした……
-    if (responseURL.match(/^URL:/)) {
-      exitURL = responseURL.replace(/^URL:/, "");
-    }
-
-    location.href = exitURL;
+   Neo.clone = function (src) {
+	var dst = {};
+	for (var k in src) {
+	  dst[k] = src[k];
+	}
+	return dst;
   };
-  request.onerror = function (e) {
-    console.log("error");
-    Neo.submitButton.enable();
+  
+  Neo.getSizeString = function (len) {
+	var result = String(len);
+	while (result.length < 8) {
+	  result = "0" + result;
+	}
+	return result;
   };
-  request.onabort = function (e) {
-    console.log("abort");
-    Neo.submitButton.enable();
+  
+  Neo.openURL = function (url) {
+	if (Neo.isApp) {
+	  require("electron").shell.openExternal(url);
+	} else {
+	  window.open(url, "_blank");
+	}
   };
-  request.ontimeout = function (e) {
-    console.log("timeout");
-    Neo.submitButton.enable();
+  
+  Neo.getAbsoluteURL = function (board, url) {
+	if (url && (url.indexOf('://') > 0 || url.indexOf('//') === 0)) {
+	  return url;
+	} else {
+	  return board + url;
+	}
+  }
+  
+  Neo.submit = function (board, blob, thumbnail, thumbnail2) {
+	var url = Neo.getAbsoluteURL(board, Neo.config.url_save);
+	var headerString = Neo.str_header || "";
+  
+	if (document.paintBBSCallback) {
+	  var result = document.paintBBSCallback("check");
+	  if (result == 0 || result == "false") {
+		return;
+	  }
+  
+	  result = document.paintBBSCallback("header");
+	  if (result && typeof result == "string") {
+		headerString = result;
+	  }
+	}
+	if (!headerString) headerString = Neo.config.send_header || "";
+  
+	var imageType = Neo.config.send_header_image_type;
+	if (imageType && imageType == "true") {
+	  headerString = "image_type=png&" + headerString;
+	}
+  
+	var count = Neo.painter.securityCount;
+	var timer = new Date() - Neo.painter.securityTimer;
+	if (Neo.config.send_header_count == "true") {
+	  headerString = "count=" + count + "&" + headerString;
+	}
+	if (Neo.config.send_header_timer == "true") {
+	  headerString = "timer=" + timer + "&" + headerString;
+	}
+	console.log("header: " + headerString);
+  
+	if (Neo.config.neo_emulate_security_error == "true") {
+	  var securityError = false;
+	  if (Neo.config.security_click) {
+		if (count - parseInt(Neo.config.security_click || 0) < 0) {
+		  securityError = true;
+		}
+	  }
+	  if (Neo.config.security_timer) {
+		if (timer - parseInt(Neo.config.security_timer || 0) * 1000 < 0) {
+		  securityError = true;
+		}
+	  }
+	  if (securityError && Neo.config.security_url) {
+		if (Neo.config.security_post == "true") {
+		  url = Neo.config.security_url;
+		} else {
+		  location.href = Neo.config.security_url;
+		  return;
+		}
+	  }
+	}
+	if (Neo.config.neo_send_with_formdata == "true") {
+  
+	  var formData = new FormData(); // Currently empty
+	  formData.append('header', headerString);
+	  formData.append('picture',blob,blob);
+  
+	  if (thumbnail) {
+		  formData.append('thumbnail',thumbnail,blob);
+		}
+		if (thumbnail2) {
+		  formData.append('pch',thumbnail2,blob);
+	  }
+	}
+	// console.log("submit url=" + url + " header=" + headerString);
+  
+	var header = new Blob([headerString]);
+	var headerLength = this.getSizeString(header.size);
+	var imgLength = this.getSizeString(blob.size);
+  
+	var array = [
+	  "P", // PaintBBS
+	  headerLength,
+	  header,
+	  imgLength,
+	  "\r\n",
+	  blob,
+	];
+  
+	if (thumbnail) {
+	  var thumbnailLength = this.getSizeString(thumbnail.size);
+	  array.push(thumbnailLength, thumbnail);
+	}
+	if (thumbnail2) {
+	  var thumbnail2Length = this.getSizeString(thumbnail2.size);
+	  array.push(thumbnail2Length, thumbnail2);
+	}
+  
+	var futaba = location.hostname.match(/2chan.net/i);
+	var subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
+	var body = new Blob(array, { type: "application/" + subtype });
+  
+	var request = new XMLHttpRequest();
+	request.open("POST", url, true);
+  
+	request.onload = function (e) {
+	  console.log(request.response, "status=", request.status);
+  
+	  var errorMessage = null;
+	  if (request.status / 100 != 2) {
+	  errorMessage = request.responseURL + "\n";
+	  if (request.status == 403) {
+		  errorMessage = errorMessage + Neo.translate("投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。");
+		  } else if (request.status == 404) {
+		  errorMessage = errorMessage + Neo.translate("ファイルが見当たりません。");
+		  } else {
+		  errorMessage = errorMessage + 
+		  + Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
+		  }
+	  } else if (request.response.match(/^error\n/m)) {
+		errorMessage = request.response.replace(/^error\n/m, '');
+	  } else {
+		Neo.uploaded = true;
+	  }
+  
+	  var exitURL = Neo.getAbsoluteURL(board, Neo.config.url_exit);
+	  var responseURL = request.response.replace(/&amp;/g, "&");
+  
+	  // ふたばではresponseの文字列をそのままURLとして解釈する
+	  if (responseURL.match(/painttmp=/)) {
+		exitURL = responseURL;
+	  }
+	  // responseが "URL:〜" の形だった場合はそのURLへ
+	  if (responseURL.match(/^URL:/)) {
+		exitURL = responseURL.replace(/^URL:/, "");
+	  }
+  
+	  if (Neo.uploaded) {
+		location.href = exitURL;
+	  } else {
+		alert(errorMessage);
+		Neo.submitButton.enable();
+	  }
+	};
+	request.onerror = function (e) {
+	  var errorMessage = null;
+	  errorMessage = Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
+	  alert(errorMessage);
+	  console.log("error");
+	  Neo.submitButton.enable();
+	};
+	request.onabort = function (e) {
+	  console.log("abort");
+	  Neo.submitButton.enable();
+	};
+	request.ontimeout = function (e) {
+	  console.log("timeout");
+	  Neo.submitButton.enable();
+	};
+	request.setRequestHeader("X-Requested-With", "PaintBBS");
+	if (Neo.config.neo_send_with_formdata == "true") {
+	  request.send(formData);
+	}else{
+	request.send(body);
+	}
   };
-
-  request.send(body);
-};
-
+	
 /*
   -----------------------------------------------------------------------
     LiveConnect
@@ -1462,6 +1502,11 @@ Neo.dictionary = {
     早: "H",
     既: "M",
     鈍: "L",
+    "投稿に失敗。時間を置いて再度投稿してみてください。":
+      "Please push send button again.",
+    "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。":
+      "It may be a WAF false positive.\nTry to draw a little more.",
+    "ファイルが見当たりません。":"File not found",
   },
   enx: {
     やり直し: "Redo",
@@ -1469,7 +1514,7 @@ Neo.dictionary = {
     塗り潰し: "Fill",
     窓: "Float",
     投稿: "Send",
-    "(C)しぃちゃん PaintBBS NEO": "&copy;shi-cyan PaintBBS NEO",
+    "(C)しぃちゃん PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
     鉛筆: "Solid",
     水彩: "WaterCo",
     ﾃｷｽﾄ: "Text",
@@ -1518,14 +1563,19 @@ Neo.dictionary = {
     早: "H",
     既: "M",
     鈍: "L",
-  },
+    "投稿に失敗。時間を置いて再度投稿してみてください。":
+      "Failed to upload image. please try again.",
+    "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。":
+      "It may be a WAF false positive.\nTry to draw a little more.",
+    "ファイルが見当たりません。":"File not found.",
+ },
   es: {
     やり直し: "Rehacer",
     元に戻す: "Deshacer",
     塗り潰し: "Llenar",
     窓: "Ventana",
     投稿: "Enviar",
-    "(C)しぃちゃん PaintBBS NEO": "&copy;shi-cyan PaintBBS NEO",
+    "(C)しぃちゃん PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
     鉛筆: "Lápiz",
     水彩: "Acuarela",
     ﾃｷｽﾄ: "Texto",
@@ -1574,6 +1624,11 @@ Neo.dictionary = {
     早: "H",
     既: "M",
     鈍: "L",
+    "投稿に失敗。時間を置いて再度投稿してみてください。":
+      "No se pudo cargar la imagen. por favor, inténtalo de nuevo.",
+    "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。":
+	  "Puede ser un falso positivo de WAF.\nIntenta dibujar un poco más.",
+    "ファイルが見当たりません。":"Archivo no encontrado.",
   },
 };
 
@@ -1879,7 +1934,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     this.canvas[i] = document.createElement("canvas");
     this.canvas[i].width = width;
     this.canvas[i].height = height;
-    this.canvasCtx[i] = this.canvas[i].getContext("2d");
+    this.canvasCtx[i] = this.canvas[i].getContext("2d", {
+		willReadFrequently: true,
+	});
 
     this.canvas[i].style.imageRendering = "pixelated";
     this.canvasCtx[i].imageSmoothingEnabled = false;
@@ -1890,7 +1947,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   this.tempCanvas = document.createElement("canvas");
   this.tempCanvas.width = width;
   this.tempCanvas.height = height;
-  this.tempCanvasCtx = this.tempCanvas.getContext("2d");
+  this.tempCanvasCtx = this.tempCanvas.getContext("2d", {
+	willReadFrequently: true,
+  });
   this.tempCanvas.style.position = "absolute";
   this.tempCanvas.enabled = false;
 
@@ -1902,7 +1961,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     this.container.appendChild(this.destCanvas);
   }
 
-  this.destCanvasCtx = this.destCanvas.getContext("2d");
+  this.destCanvasCtx = this.destCanvas.getContext("2d", {
+	willReadFrequently: true,
+  });
   this.destCanvas.width = destWidth;
   this.destCanvas.height = destHeight;
 
@@ -2599,7 +2660,9 @@ Neo.Painter.prototype.getImage = function (imageWidth, imageHeight) {
   var pngCanvas = document.createElement("canvas");
   pngCanvas.width = imageWidth;
   pngCanvas.height = imageHeight;
-  var pngCanvasCtx = pngCanvas.getContext("2d");
+  var pngCanvasCtx = pngCanvas.getContext("2d", {
+	willReadFrequently: true,
+  });
   pngCanvasCtx.fillStyle = "#ffffff";
   pngCanvasCtx.fillRect(0, 0, imageWidth, imageHeight);
 
@@ -4428,7 +4491,7 @@ Neo.Painter.prototype.getEmulationMode = function () {
    -------------------------------------------------------------------------
  */
 
-Neo.Painter.prototype.play = function (wait) {
+Neo.Painter.prototype.play = function () {
   if (this._actionMgr) {
     this._actionMgr.clearCanvas();
     this.prevLine = null;
@@ -4439,7 +4502,7 @@ Neo.Painter.prototype.play = function (wait) {
     this._actionMgr._index = 0;
     this._actionMgr._mark = this._actionMgr._items.length;
     this._actionMgr._pause = false;
-    this._actionMgr.play(wait);
+    this._actionMgr.play();
   }
 };
 
@@ -4483,10 +4546,8 @@ Neo.Painter.prototype.onstop = function () {
 
 Neo.Painter.prototype.onspeed = function () {
   var mgr = Neo.painter._actionMgr;
-  var mode = (mgr._speedMode + 1) % 4;
-  mgr._speedMode = mode;
-  mgr._speed = mgr._speedTable[mode];
-  //  console.log('speed=', mgr._speed);
+  var mode = mgr.speedMode();
+  Neo.speed = mgr._speedTable[(mode + 1) % 4];
 };
 
 Neo.Painter.prototype.setCurrent = function (item) {
@@ -6020,28 +6081,22 @@ Neo.ActionManager = function () {
   this._pause = false;
   this._mark = 0;
 
-  this._speedTable = [-1, 0, 1, 11];
-  this._speed = parseInt(Neo.config.speed || 0);
-  this._speedMode = this.generateSpeedTable();
+  this._speedTable = [-1, 0, 1, 11]; // [最, 早, 既, 鈍]
 
-  this._prevSpeed = this._speed; // freeHandの途中で速度が変わると困るので
+  Neo.speed = parseInt(Neo.config.speed || 0);
+  this._prevSpeed = Neo.speed;
 };
 
-Neo.ActionManager.prototype.generateSpeedTable = function () {
-  var speed = this._speed;
-  var mode = 0;
-
-  if (speed < 0) {
-    mode = 0;
-  } else if (speed == 0) {
-    mode = 1;
-  } else if (speed <= 10) {
-    mode = 2;
+Neo.ActionManager.prototype.speedMode = function () {
+  if (Neo.speed < 0) {
+    return 0;
+  } else if (Neo.speed == 0) {
+    return 1;
+  } else if (Neo.speed <= 10) {
+    return 2;
   } else {
-    mode = 3;
+    return 3;
   }
-  this._speedTable[mode] = speed;
-  return mode;
 };
 
 Neo.ActionManager.prototype.step = function () {
@@ -6106,7 +6161,7 @@ Neo.ActionManager.prototype.getCurrent = function (item) {
   oe._currentMaskType = item[10];
 };
 
-Neo.ActionManager.prototype.skip = function (wait) {
+Neo.ActionManager.prototype.skip = function () {
   for (var i = 0; i < this._items.length; i++) {
     if (this._items[i][0] == "restore") {
       this._head = i;
@@ -6114,11 +6169,7 @@ Neo.ActionManager.prototype.skip = function (wait) {
   }
 };
 
-Neo.ActionManager.prototype.play = function (wait) {
-  if (!wait) {
-    wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
-    wait *= 1; //2
-  }
+Neo.ActionManager.prototype.play = function () {
   if (Neo.viewerBar) Neo.viewerBar.update();
 
   if (this._pause) {
@@ -6139,12 +6190,14 @@ Neo.ActionManager.prototype.play = function (wait) {
       );
     }
 
-    if (Neo.viewer && Neo.viewerBar) {
-      console.log("play", item[0], this._head + 1, this._items.length);
+    if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
+      Neo.viewerSpeed.update();
+      //console.log("play", item[0], this._head + 1, this._items.length);
     }
 
-    var that = this;
     var func = item[0] && this[item[0]] ? item[0] : "dummy";
+    var that = this;
+    var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
     this[func](item, function (result) {
       if (result) {
@@ -6159,22 +6212,19 @@ Neo.ActionManager.prototype.play = function (wait) {
           that._head++;
         }
         that._index = 0;
-        that._prevSpeed = that._speed;
+        that._prevSpeed = Neo.speed;
       }
 
-      if (that._prevSpeed < 0 && that._head % 10 != 0) {
+      setTimeout(function () {
         Neo.painter._actionMgr.play();
-      } else {
-        setTimeout(function () {
-          Neo.painter._actionMgr.play();
-        }, wait);
-      }
+      }, wait);
     });
+
   } else {
     Neo.painter.dirty = false;
     Neo.painter.busy = false;
 
-    if (Neo.painter.bushSkipped) {
+    if (Neo.painter.busySkipped) {
       Neo.painter.busySkipped = false;
       console.log("animation skipped");
     } else {
@@ -6965,13 +7015,14 @@ Neo.startViewer = function () {
     Neo.viewerStop.onmouseup = function () {
       Neo.painter.onstop();
     };
+    Neo.viewerSpeed = new Neo.ViewerButton().init("viewerSpeed");
+    Neo.viewerSpeed.onmouseup = function () {
+      Neo.painter.onspeed();
+      this.update();
+    };
 
     new Neo.ViewerButton().init("viewerRewind").onmouseup = function () {
       Neo.painter.onrewind();
-    };
-    new Neo.ViewerButton().init("viewerSpeed").onmouseup = function () {
-      Neo.painter.onspeed();
-      this.update();
     };
     new Neo.ViewerButton().init("viewerPlus").onmouseup = function () {
       new Neo.ZoomPlusCommand(Neo.painter).execute();
@@ -7061,7 +7112,16 @@ Neo.suspendDraw = function () {
 };
 
 Neo.setSpeed = function (value) {
-  Neo.painter._actionMgr._speed = value;
+  Neo.speed = value;
+};
+
+Neo.setVisit = function (layer, value) {
+  Neo.painter.visible[layer] = (value == 0) ? false : true;
+  Neo.painter.updateDestCanvas(
+    0,
+    0,
+    Neo.painter.canvasWidth,
+    Neo.painter.canvasHeight);
 };
 
 Neo.setMark = function (value) {
@@ -7510,7 +7570,9 @@ Neo.ToolTip.prototype.update = function () {};
 Neo.ToolTip.prototype.draw = function (c) {
   if (this.hasTintImage) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
-    var ctx = this.canvas.getContext("2d");
+    var ctx = this.canvas.getContext("2d", {
+	willReadFrequently: true,
+  });
 
     if (this.prevMode != this.mode) {
       this.prevMode = this.mode;
@@ -7683,7 +7745,9 @@ Neo.Pen2Tip.prototype.update = function () {
 };
 
 Neo.Pen2Tip.prototype.drawTone = function () {
-  var ctx = this.canvas.getContext("2d");
+  var ctx = this.canvas.getContext("2d", {
+	willReadFrequently: true,
+  });
 
   var imageData = ctx.getImageData(0, 0, 46, 18);
   var buf32 = new Uint32Array(imageData.data.buffer);
@@ -7756,7 +7820,9 @@ Neo.EraserTip.prototype.update = function () {
 };
 
 Neo.EraserTip.prototype.draw = function () {
-  var ctx = this.canvas.getContext("2d");
+  var ctx = this.canvas.getContext("2d", {
+	willReadFrequently: true,
+  });
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   var img = new Image();
 
@@ -7921,7 +7987,9 @@ Neo.MaskTip.prototype.update = function () {
 Neo.MaskTip.prototype.draw = function (c) {
   if (typeof c != "string") c = Neo.painter.getColorString(c);
 
-  var ctx = this.canvas.getContext("2d");
+  var ctx = this.canvas.getContext("2d", {
+	willReadFrequently: true,
+  });
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   ctx.fillStyle = c;
   ctx.fillRect(1, 1, 43, 9);
@@ -8473,7 +8541,9 @@ Neo.ViewerButton.prototype.init = function (name, params) {
   if (name != "viewerSpeed") {
     this.element.innerHTML = "<canvas width=24 height=24></canvas>";
     this.canvas = this.element.getElementsByTagName("canvas")[0];
-    var ctx = this.canvas.getContext("2d");
+    var ctx = this.canvas.getContext("2d", {
+	willReadFrequently: true,
+  });
 
     var img = new Image();
     img.src = Neo.ViewerButton[name.toLowerCase().replace(/viewer/, "")];
@@ -8492,7 +8562,7 @@ Neo.ViewerButton.prototype.init = function (name, params) {
 
 Neo.ViewerButton.prototype.update = function () {
   if (this.name == "viewerSpeed") {
-    var mode = Neo.painter._actionMgr._speedMode;
+    var mode = Neo.painter._actionMgr.speedMode();
     var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
     this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
   }
