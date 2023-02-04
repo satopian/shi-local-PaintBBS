@@ -213,7 +213,7 @@
 			<div class="palette">
 				<form name="Palette">
 					<span class="palette_desc">PALETTE</span> <input type="button" value="一時保存"
-						OnClick="PaletteSave()"><br>
+						onclick="PaletteSave()"><br>
 					<select name="select" size="13" onChange="setPalette()" class="palette_select">
 						<option>一時保存パレット</option>
 						<option>肌色系</option>
@@ -229,29 +229,29 @@
 						<option>萌えサクラ</option>
 						<option>モノクロ</option>
 					</select><br>
-					<input type="button" VALUE="作成" OnClick="PaletteNew()">
-					<input type="button" VALUE="変更" OnClick="PaletteRenew()">
-					<input type="button" VALUE="削除" OnClick="PaletteDel()"><br>
-					<input type="button" VALUE="明＋" OnClick="P_Effect(10)">
-					<input type="button" VALUE="明－" OnClick="P_Effect(-10)">
-					<input type="button" VALUE="反転" OnClick="P_Effect(255)">
+					<input type="button" value="作成" onclick="PaletteNew()">
+					<input type="button" value="変更" onclick="PaletteRenew()">
+					<input type="button" value="削除" onclick="PaletteDel()"><br>
+					<input type="button" value="明＋" onclick="P_Effect(10)">
+					<input type="button" value="明－" onclick="P_Effect(-10)">
+					<input type="button" value="反転" onclick="P_Effect(255)">
 					<hr class="palette_hr"><span class="palette_desc">MATRIX</span>
 					<select name="m_m">
 						<option value="0">全体</option>
 						<option value="1">現在</option>
 						<option value="2">追加</option>
 					</select><br>
-					<input name="m_g" type="button" VALUE="取得" OnClick="PaletteMatrixGet()">
-					<input name="m_s" type="button" VALUE="セット" OnClick="PalleteMatrixSet()">
-					<input name="m_h" type="button" VALUE=" ? " OnClick="PalleteMatrixHelp()"><br>
+					<input name="m_g" type="button" value="取得" onclick="PaletteMatrixGet()">
+					<input name="m_s" type="button" value="セット" onclick="PalleteMatrixSet()">
+					<input name="m_h" type="button" value=" ? " onclick="PalleteMatrixHelp()"><br>
 					<textarea rows="1" name="setr" cols="13" onMouseOver="this.select()"></textarea><br>
 				</form>
 			</div>
 			<div class="palette_gradation">
 				<form name="grad">
-					<label class="palette_desc checkbox"><INPUT type="checkbox" name="view" OnClick="showHideLayer()"
-							id="grdchk">GRADATION&nbsp;</label><INPUT type="button" VALUE=" OK "
-						OnClick="ChengeGrad()"><br>
+					<label class="palette_desc checkbox"><INPUT type="checkbox" name="view" onclick="showHideLayer()"
+							id="grdchk">GRADATION&nbsp;</label><INPUT type="button" value=" OK "
+						onclick="ChengeGrad()"><br>
 					<select name="p_st" onChange="GetPalette()">
 						<option>1</option>
 						<option>2</option>
