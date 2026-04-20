@@ -42,10 +42,6 @@
 			margin: 10px auto;
 		}
 
-		#pageView {
-			margin: 0 !important;
-		}
-
 		.appstage {
 			margin: 16px auto;
 			display: table;
@@ -70,6 +66,15 @@
 			margin: 8px 0;
 			font-size: 30px;
 		}
+	.toolpalette_label {
+		margin:0 5px 0 10px;
+	}
+	.stabilizer_label {
+		margin:0 10px;
+	}
+	select:focus {
+		outline: none;
+	}
 	</style>
 </head>
 <body>
@@ -103,7 +108,6 @@ pe[n]}}function GradView(a,f){d=document}function showHideLayer(){d=document;var
 		<H3>JavaScriptが有効でないため正常に動作致しません</H3>
 	</NOSCRIPT>
 	<div class="appstage">
-		<div class="app">
 			<form>
 				<select class=canvas_select name="w" title=幅>
 					<option value=300>300
@@ -138,16 +142,27 @@ pe[n]}}function GradView(a,f){d=document}function showHideLayer(){d=document;var
 					<option value=950>950
 					<option value=1000>1000
 				</select>
-
-				<input type="submit" value="Choice">
+				<input type="submit" value="選択">
 			</form>
-			Toolbar <input type="radio" name="1" id="1" onclick="Neo.setToolSide(true)" class="nts_radio"><label
-				class="ntslabel" for="1">Left</label>
+			<span class="toolpalette_label">ツール</span> <input type="radio" name="1" id="1" onclick="Neo.setToolSide(true)" class="nts_radio"><label
+				class="ntslabel" for="1">左</label>
 			<input type="radio" name="1" id="2" onclick="Neo.setToolSide(false)" checked="checked" class="nts_radio"><label
-				class="ntslabel" for="2">Right</label>
-			<br>
-			<div id="appletdummy"></div>
+				class="ntslabel" for="2">右</label>
+			<span class="stabilizer_label">手ぶれ補正</span>
+				<select onchange="Neo.setStabilizLevel(this.value)">
+					<option value="0">0</option>
+					<option value="1" selected>1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+				</select>
+			</span>
 
+			<br>
+		<div class="app">
+
+			<div id="appletdummy"></div>
 			<script>
 
 		const html = `<applet-dummy name="paintbbs" width="${appw}" height="${apph}" >
