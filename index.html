@@ -42,9 +42,17 @@
 			margin: 10px auto;
 		}
 
+		.app_select {
+			margin: 8px auto 0;
+		}
+
+
 		.appstage {
-			margin: 16px auto;
+			margin: 0 auto;
 			display: table;
+		}
+		.app {
+			display: table-cell;
 		}
 
 		label {
@@ -107,7 +115,7 @@ pe[n]}}function GradView(a,f){d=document}function showHideLayer(){d=document;var
 	<NOSCRIPT>
 		<H3>JavaScriptが有効でないため正常に動作致しません</H3>
 	</NOSCRIPT>
-	<div class="appstage">
+	<div class="app_select">
 			<form>
 				<select class=canvas_select name="w" title=幅>
 					<option value=300>300
@@ -125,7 +133,7 @@ pe[n]}}function GradView(a,f){d=document}function showHideLayer(){d=document;var
 					<option value=900>900
 					<option value=950>950
 					<option value=1000>1000
-				</select> x <select class=canvas_select name="h" title=高さ>
+				</select> x <select class="canvas_select" name="h" title=高さ>
 					<option value=300>300
 					<option value=350>350
 					<option value=400>400
@@ -144,12 +152,12 @@ pe[n]}}function GradView(a,f){d=document}function showHideLayer(){d=document;var
 				</select>
 				<input type="submit" value="選択">
 			</form>
-			<span class="toolpalette_label">ツール</span> <input type="radio" name="1" id="1" onclick="Neo.setToolSide(true)" class="nts_radio"><label
-				class="ntslabel" for="1">左</label>
+			<span class="toolpalette_label">ツールを</span> <input type="radio" name="1" id="1" onclick="Neo.setToolSide(true)" class="nts_radio"><label
+				class="ntslabel" for="1">左へ</label>
 			<input type="radio" name="1" id="2" onclick="Neo.setToolSide(false)" checked="checked" class="nts_radio"><label
-				class="ntslabel" for="2">右</label>
+				class="ntslabel" for="2">右へ</label>
 			<span class="stabilizer_label">手ぶれ補正</span>
-				<select onchange="Neo.setStabilizLevel(this.value)">
+				<select onchange="Neo.setStabilizLevel(this.value)" class="canvas_select">
 					<option value="0">0</option>
 					<option value="1" selected>1</option>
 					<option value="2">2</option>
@@ -158,10 +166,9 @@ pe[n]}}function GradView(a,f){d=document}function showHideLayer(){d=document;var
 					<option value="5">5</option>
 				</select>
 			</span>
-
-			<br>
+		</div>
+	<div class="appstage">
 		<div class="app">
-
 			<div id="appletdummy"></div>
 			<script>
 
@@ -206,7 +213,8 @@ pe[n]}}function GradView(a,f){d=document}function showHideLayer(){d=document;var
 					}
 				}
 			}
-
+			const app_select = document.querySelector(".app_select");
+			app_select.style.width = ((Number(w)) + 317) + "px";
 			</script>
 		</div>
 		<div class="palette_wrap">
