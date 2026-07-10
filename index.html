@@ -5,10 +5,10 @@
 	<title>shi local PaintBBS</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
-	<link rel="stylesheet" href="./pickr/themes/classic.min.css??20260628"/>
+	<link rel="stylesheet" href="./pickr/themes/monolith.min.css??20260628"/>
 	<script src="./pickr/pickr.min.js?20260628"></script>
 	<link rel="stylesheet" href="neo.css?20260628">
-	<script src="neo.js?20262628"></script>
+	<script src="neo.js?20260710"></script>
 	<script>
 		const params = location.search.substring(1).split('&').reduce((result, query) => {
 			const [k, v] = query.split('=');
@@ -323,8 +323,9 @@ if(f instanceof HTMLSelectElement&&b instanceof HTMLSelectElement)for(c=0;e>c;c+
 					// Pickrの初期化
 					const pickr = Pickr.create({
 							el: "#pickr-container",
-							theme: 'classic',
+							theme: 'monolith', // or 'monolith', or 'nano'
 							position: 'top-start',
+							comparison: false,
 							components: {
 									preview: true,
 									opacity: false,
@@ -344,8 +345,13 @@ if(f instanceof HTMLSelectElement&&b instanceof HTMLSelectElement)for(c=0;e>c;c+
 
 					document.addEventListener("neo:colorchange", (e) => {
 						isUpdatingFromNeo = true;
-							pickr.setColor(e.detail.hex);
-							isUpdatingFromNeo = false;
+						const currentH = pickr._color.h; // 現在のhueを保存
+						pickr.setColor(e.detail.hex);
+						if (pickr._color.v === 0 || pickr._color.s === 0) {
+								pickr._color.h = currentH; // hueを復元
+								pickr._components.hue.update(currentH / 360); // 色相スライダーを更新
+						}
+						isUpdatingFromNeo = false;
 					});
 					document.addEventListener("neo:fullscreenchange", (e) => {
 						const pickr = document.querySelector(".pickr");
